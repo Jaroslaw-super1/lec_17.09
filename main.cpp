@@ -27,6 +27,24 @@ bool isInside(double x, double y, double r)
   return (x - r) * (x - r) + (y - r) * (y - r) <= r * r;
 }
 
+size_t calc(double r, size_t tests, size_t seed)
+{
+  std::default_random_engine gen(static_cast< std::default_random_engine::result_type >(seed));
+  std::uniform_real_distribution< double > dist(0.0, 2.0 * r);
+
+  size_t inside = 0;
+  for (size_t i = 0; i < tests; ++i)
+  {
+    double x = dist(gen);
+    double y = dist(gen);
+    if (isInside(x, y, r))
+    {
+      ++inside;
+    }
+  }
+  return inside;
+}
+
 void * thread_func(void * arg)
 {
   auto * a = static_cast< Args * >(arg);
