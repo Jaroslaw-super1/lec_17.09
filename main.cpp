@@ -9,6 +9,11 @@ void * sample(void * data)
   return reinterpret_cast< void* >(len);
 }
 
+bool isInside(double x, double y, double r)
+{
+  return x * x + y * y <= r * r;
+}
+
 int main()
 {
   char msg[] = "user data";
