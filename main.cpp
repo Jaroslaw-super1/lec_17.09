@@ -38,7 +38,6 @@ double getArea(double r, size_t threads, size_t tests)
 {
   std::vector< pthread_t > tids(threads);
   std::vector< Args > args(threads);
-  args.reserve(threads);
 
   size_t base = tests / threads;
   size_t ost  = tests % threads;
@@ -51,7 +50,28 @@ double getArea(double r, size_t threads, size_t tests)
     args[i].seed  = base_seed + i * 1000003;
     args[i].inside = 0;
 
+    int err = pthread_create(&tids[i], nullptr, thread_func, &args[i]);
+
+    if (err != 0)
+    {
+      std::cerr << "pthread_create: " << strerror(err) << "\n";
+      return 0.0;
+    }
   }
+
+  size_t total_inside = 0;
+  for (size_t i = 0; i < threads; ++i)
+  {
+    int err = pthread_join(tids[i], nullptr);
+
+    if (err != 0)
+    {
+      std::cerr << "pthread_join: " << strerror(err) << "\n";
+    }
+    total_inside += args[i].inside;
+  }
+
+  return 4.0 * r * r * static_cast< double >(total_inside) / static_cast< double >(tests);
 }
 
 
