@@ -14,14 +14,44 @@
 //   return reinterpret_cast< void * >(len);
 // }
 
+struct Args
+{
+  double r;
+  size_t tests;
+  size_t seed;
+  size_t inside;
+};
+
 bool isInside(double x, double y, double r)
 {
   return (x - r) * (x - r) + (y - r) * (y - r) <= r * r;
 }
 
+void * thread_func(void * arg)
+{
+  auto * a = static_cast< Args * >(arg);
+  a->inside = calc(a->r, a->tests, a->seed);
+  return nullptr;
+}
+
 double getArea(double r, size_t threads, size_t tests)
 {
+  std::vector< pthread_t > tids(threads);
+  std::vector< Args > args(threads);
+  args.reserve(threads);
 
+  size_t base = tests / threads;
+  size_t ost  = tests % threads;
+  size_t base_seed = 12345;
+
+  for (size_t i = 0; i < threads; ++i)
+  {
+    args[i].r = r;
+    args[i].tests = base + (i < ost ? 1 : 0);
+    args[i].seed  = base_seed + i * 1000003;
+    args[i].inside = 0;
+
+  }
 }
 
 
